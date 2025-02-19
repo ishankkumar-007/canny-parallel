@@ -1,0 +1,32 @@
+--------------------------------------------------------------------------------
+CPU name:	Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz
+CPU type:	Intel Coffeelake processor
+CPU clock:	3.00 GHz
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Group 1: FLOPS_SP
++------------------------------------------+---------+--------------+
+|                   Event                  | Counter |  HWThread 0  |
++------------------------------------------+---------+--------------+
+|             INSTR_RETIRED_ANY            |  FIXC0  | 336321234378 |
+|           CPU_CLK_UNHALTED_CORE          |  FIXC1  |  90155106761 |
+|           CPU_CLK_UNHALTED_REF           |  FIXC2  |  58939651875 |
+| FP_ARITH_INST_RETIRED_128B_PACKED_SINGLE |   PMC0  |            0 |
+|    FP_ARITH_INST_RETIRED_SCALAR_SINGLE   |   PMC1  |            0 |
+| FP_ARITH_INST_RETIRED_256B_PACKED_SINGLE |   PMC2  |            0 |
++------------------------------------------+---------+--------------+
+
++-------------------------+------------+
+|          Metric         | HWThread 0 |
++-------------------------+------------+
+|   Runtime (RDTSC) [s]   |    20.9662 |
+|   Runtime unhalted [s]  |    30.0478 |
+|       Clock [MHz]       |  4589.4447 |
+|           CPI           |     0.2681 |
+|       SP [MFLOP/s]      |          0 |
+|     AVX SP [MFLOP/s]    |          0 |
+|     Packed [MUOPS/s]    |          0 |
+|     Scalar [MUOPS/s]    |          0 |
+| Vectorization ratio [%] |          0 |
++-------------------------+------------+
+

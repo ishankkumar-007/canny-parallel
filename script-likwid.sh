@@ -1,0 +1,11 @@
+likwid-perfctr -C S0:0 -g DATA ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g ENERGY ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g FLOPS_DP ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g FLOPS_SP ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g ICACHE ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g L2 ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g L2CACHE ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g L3 ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g L3CACHE ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g PERF ./a.out chess.pgm 100 1
+likwid-perfctr -C S0:0 -g TLB_INSTR ./a.out chess.pgm 100 1

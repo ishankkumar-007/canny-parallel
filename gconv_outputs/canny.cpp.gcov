@@ -1,0 +1,360 @@
+        -:    0:Source:canny.cpp
+        -:    0:Graph:canny.gcno
+        -:    0:Data:canny.gcda
+        -:    0:Runs:1
+        -:    1:#include "header_files/canny.hpp"
+        -:    2:#include "header_files/global.hpp"
+        -:    3:
+        -:    4:using namespace std;
+        -:    5:
+        -:    6:// =================================== Magnitude Image ==================================
+        -:    7:// We'll start by filling in the mask values using the Gausian 1st derivative. Next, do a
+        -:    8:// scanning convolution on the input pic matrix. This will give us the Δy and Δx matrices
+        -:    9:// Finally, take the sqrt of the sum of Δy^2 and Δx^2 to find the magnitude.
+        -:   10:// =================================== Magnitude Image ==================================
+function _Z16magnitude_matrixPPdS0_S0_S0_ called 1000 returned 100% blocks executed 100%
+     1000:   11:void magnitude_matrix(double **pic, double **mag, double **x, double **y)
+        -:   12:{
+     1000:   13:	int dim = 6 * sig + 1, cent = dim / 2;
+     1000:   14:	double maskx[dim][dim], masky[dim][dim];
+        -:   15:
+        -:   16:	// Use the Gausian 1st derivative formula to fill in the mask values
+     8000:   17:	for (int p = -cent; p <= cent; p++)
+branch  0 taken 7000 (fallthrough)
+branch  1 taken 1000
+        -:   18:	{	
+    56000:   19:		for (int q = -cent; q <= cent; q++)
+branch  0 taken 49000 (fallthrough)
+branch  1 taken 7000
+        -:   20:		{
+    49000:   21:			maskx[p+cent][q+cent] = q * exp(-1 * ((p * p + q * q) / (2 * sig * sig)));
+    49000:   22:			masky[p+cent][q+cent] = p * exp(-1 * ((p * p + q * q) / (2 * sig * sig)));
+        -:   23:		}
+        -:   24:	}
+        -:   25:
+        -:   26:	// Scanning convolution
+        -:   27:	double sumx, sumy;
+   257000:   28:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+        -:   29:	{ 
+ 65792000:   30:		for (int j = 0; j < width; j++)
+branch  0 taken 65536000 (fallthrough)
+branch  1 taken 256000
+        -:   31:		{
+ 65536000:   32:			sumx = 0;
+ 65536000:   33:			sumy = 0;
+        -:   34:
+        -:   35:			// This is the convolution
+524288000:   36:			for (int p = -cent; p <= cent; p++)
+branch  0 taken 458752000 (fallthrough)
+branch  1 taken 65536000
+        -:   37:			{
+3670016000:   38:				for (int q = -cent; q <= cent; q++)
+branch  0 taken 3211264000 (fallthrough)
+branch  1 taken 458752000
+        -:   39:				{
+3211264000:   40:					if ((i+p) < 0 || (j+q) < 0 || (i+p) >= height || (j+q) >= width)
+branch  0 taken 3200512000 (fallthrough)
+branch  1 taken 10752000
+branch  2 taken 3189796000 (fallthrough)
+branch  3 taken 10716000
+branch  4 taken 3179080000 (fallthrough)
+branch  5 taken 10716000
+branch  6 taken 10680000 (fallthrough)
+branch  7 taken 3168400000
+ 42864000:   41:						continue;
+        -:   42:					
+3168400000:   43:					sumx += pic[i+p][j+q] * maskx[p+cent][q+cent];
+3168400000:   44:					sumy += pic[i+p][j+q] * masky[p+cent][q+cent];
+        -:   45:				}
+        -:   46:			}
+        -:   47:			
+        -:   48:			// Store convolution result in respective matrix
+ 65536000:   49:			x[i][j] = sumx;
+ 65536000:   50:			y[i][j] = sumy;
+        -:   51:		}
+        -:   52:	}
+        -:   53:
+        -:   54:	// Find magnitude and maxVal, then store it in the 'mag' matrix
+        -:   55:	double mags;
+     1000:   56:	double maxVal = 0;
+   257000:   57:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+        -:   58:	{
+ 65792000:   59:		for(int j = 0; j < width; j++)
+branch  0 taken 65536000 (fallthrough)
+branch  1 taken 256000
+        -:   60:		{
+ 65536000:   61:			mags = sqrt((x[i][j] * x[i][j]) + (y[i][j] * y[i][j]));
+        -:   62:
+ 65536000:   63:			if (mags > maxVal)
+branch  0 taken 4082 (fallthrough)
+branch  1 taken 65531918
+     4082:   64:				maxVal = mags;
+        -:   65:
+ 65536000:   66:			mag[i][j] = mags;
+        -:   67:		}
+        -:   68:	}
+        -:   69:
+        -:   70:	// Make sure all the magnitude values are between 0-255
+   257000:   71:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+ 65792000:   72:		for (int j = 0; j < width; j++)
+branch  0 taken 65536000 (fallthrough)
+branch  1 taken 256000
+ 65536000:   73:			mag[i][j] = mag[i][j] / maxVal * 255;
+        -:   74:
+     2000:   75:	return;
+        -:   76:}
+        -:   77:
+        -:   78:// ================================ Peaks Detection ================================
+        -:   79:// The formula for slope is Δy/Δx. We have Δy and Δx from the scanning convulution
+        -:   80:// above. We can get the slope by dividing the two. We'll store all the points that
+        -:   81:// are greater than both it's neighbors in the direction of the slope into a vector.
+        -:   82:// We can calculate the direction of the slope using the tan(x) function. We'll also
+        -:   83:// store the peaks in a HashMap for O(1) searches in the recursiveDT function later.
+        -:   84:// ================================ Peaks Detection ================================
+function _Z14peak_detectionPPdP7HashMapS0_S0_ called 1000 returned 100% blocks executed 78%
+     1000:   85:vector<Point*> peak_detection(double **mag, HashMap *h, double **x, double **y)
+        -:   86:{
+     1000:   87:	double slope = 0;
+     1000:   88:	vector<Point*> v;
+call    0 returned 1000
+   255000:   89:	for (int i = 1; i < height - 1; i++)
+branch  0 taken 254000 (fallthrough)
+branch  1 taken 1000
+        -:   90:	{
+ 64770000:   91:		for (int j = 1; j < width - 1; j++)
+branch  0 taken 64516000 (fallthrough)
+branch  1 taken 254000
+        -:   92:		{
+        -:   93:			// To avoid dividing by zero
+ 64516000:   94:			if (x[i][j] == 0)
+branch  0 taken 249750 (fallthrough)
+branch  1 taken 64266250
+   249750:   95:				x[i][j] = 0.0001;
+        -:   96:
+ 64516000:   97:			slope = y[i][j] / x[i][j];
+        -:   98:
+        -:   99:			// We're only looking for the peaks. If we're at a peak, store 255 in 'peaks'
+ 64516000:  100:			if (slope <= tan(22.5) && slope > tan(-22.5))
+branch  0 taken 1549948 (fallthrough)
+branch  1 taken 62966052
+branch  2 taken 1024193 (fallthrough)
+branch  3 taken 525755
+        -:  101:			{
+  1024193:  102:				if (mag[i][j] > mag[i][j-1] && mag[i][j] > mag[i][j+1])
+branch  0 taken 513436 (fallthrough)
+branch  1 taken 510757
+branch  2 taken 5611 (fallthrough)
+branch  3 taken 507825
+        -:  103:				{
+     5611:  104:					v.push_back(new Point(i, j));
+call    0 returned 5611
+branch  1 taken 5611 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 5611
+branch  4 taken 5611 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 5611
+branch  7 taken 5611 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 never executed
+     5611:  105:					h->insert(i, j);
+call    0 returned 5611
+branch  1 taken 5611 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  106:				}
+        -:  107:			}
+ 63491807:  108:			else if (slope <= tan(67.5) && slope > tan(22.5))
+branch  0 taken 553091 (fallthrough)
+branch  1 taken 62938716
+branch  2 taken 27336 (fallthrough)
+branch  3 taken 525755
+        -:  109:			{
+    27336:  110:				if (mag[i][j] > mag[i-1][j-1] && mag[i][j] > mag[i+1][j+1])
+branch  0 taken 13473 (fallthrough)
+branch  1 taken 13863
+branch  2 taken 5516 (fallthrough)
+branch  3 taken 7957
+        -:  111:				{
+     5516:  112:					v.push_back(new Point(i, j));
+call    0 returned 5516
+branch  1 taken 5516 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 5516
+branch  4 taken 5516 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 5516
+branch  7 taken 5516 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 never executed
+     5516:  113:					h->insert(i, j);
+call    0 returned 5516
+branch  1 taken 5516 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  114:				}
+        -:  115:			}
+ 63464471:  116:			else if (slope <= tan(-22.5) && slope > tan(-67.5))
+branch  0 taken 525755 (fallthrough)
+branch  1 taken 62938716
+branch  2 taken 24257 (fallthrough)
+branch  3 taken 501498
+        -:  117:			{
+    24257:  118:				if (mag[i][j] > mag[i+1][j-1] && mag[i][j] > mag[i-1][j+1])
+branch  0 taken 12135 (fallthrough)
+branch  1 taken 12122
+branch  2 taken 4851 (fallthrough)
+branch  3 taken 7284
+        -:  119:				{
+     4851:  120:					v.push_back(new Point(i, j));
+call    0 returned 4851
+branch  1 taken 4851 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 4851
+branch  4 taken 4851 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 4851
+branch  7 taken 4851 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 never executed
+     4851:  121:					h->insert(i, j);
+call    0 returned 4851
+branch  1 taken 4851 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  122:				}
+        -:  123:			}
+        -:  124:			else
+        -:  125:			{
+ 63440214:  126:				if (mag[i][j] > mag[i-1][j] && mag[i][j] > mag[i+1][j])
+branch  0 taken 501755 (fallthrough)
+branch  1 taken 62938459
+branch  2 taken 970 (fallthrough)
+branch  3 taken 500785
+        -:  127:				{
+      970:  128:					v.push_back(new Point(i, j));
+call    0 returned 970
+branch  1 taken 970 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 970
+branch  4 taken 970 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 970
+branch  7 taken 970 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 never executed
+      970:  129:					h->insert(i, j);
+call    0 returned 970
+branch  1 taken 970 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  130:				}
+        -:  131:			}
+        -:  132:		}
+        -:  133:	}
+        -:  134:
+     1000:  135:	return v;
+        -:  136:}
+        -:  137:
+        -:  138:// ======================== Hysteresis & Double Thresholding ========================
+        -:  139:// The points passed into this function are coming from the peaks vector. We'll start
+        -:  140:// by searching around the current pixel for a pixel that made it to "final". If
+        -:  141:// found, then we'll recursively search for a "series" of pixels that are in the mid
+        -:  142:// range and swith all those to ON in final. We'll stop as soon as all the pixels are
+        -:  143:// either already processed or less than the 'lo' threshold.
+        -:  144:// ======================== Hysteresis & Double Thresholding ========================
+function _Z11recursiveDTPPdS0_P7HashMapS2_iii called 3479 returned 100% blocks executed 97%
+     3479:  145:void recursiveDT(double **mag, double **final, HashMap *h, HashMap *peaks, int a, int b, int flag)
+        -:  146:{
+        -:  147:	// If the pixel value is < lo, out-of-bounds, or at a point we've visited before,
+        -:  148:	// then exit the funciton.
+     3479:  149:	if (mag[a][b] < lo || a < 0 || b < 0 || a >= height || b >= width)
+branch  0 taken 3479 (fallthrough)
+branch  1 taken 0
+branch  2 taken 3479 (fallthrough)
+branch  3 taken 0
+branch  4 taken 3479 (fallthrough)
+branch  5 taken 0
+branch  6 taken 3479 (fallthrough)
+branch  7 taken 0
+branch  8 taken 0 (fallthrough)
+branch  9 taken 3479
+    #####:  150:		return;
+     3479:  151:	if (h->contains(a, b))
+call    0 returned 3479
+branch  1 taken 2269 (fallthrough)
+branch  2 taken 1210
+     2269:  152:		return;
+        -:  153:
+        -:  154:	// Insert the current pixel so we know we've been here before.
+     1210:  155:	h->insert(a, b);
+call    0 returned 1210
+        -:  156:
+        -:  157:	// If flag = 0, that means that this is the first pixel of the "series" that
+        -:  158:	// we're looking at. We're going to look for a pixel in "final" that's set to
+        -:  159:	// ON. If we found one, assert the flag and break out of the loops.
+     1210:  160:	if (!flag)
+branch  0 taken 452 (fallthrough)
+branch  1 taken 758
+        -:  161:	{
+     1771:  162:		for (int p = -1; p <= 1; p++)
+branch  0 taken 1334 (fallthrough)
+branch  1 taken 437
+        -:  163:		{
+     5297:  164:			for (int q = -1; q <= 1; q++)
+branch  0 taken 3978 (fallthrough)
+branch  1 taken 1319
+        -:  165:			{
+     3978:  166:				if (final[a+p][b+q] == 255)
+branch  0 taken 15 (fallthrough)
+branch  1 taken 3963
+        -:  167:				{
+       15:  168:					final[a][b] = 255;
+       15:  169:					flag = 1;
+       15:  170:					break;
+        -:  171:				}
+        -:  172:			}
+        -:  173:
+     1334:  174:			if (flag)
+branch  0 taken 15 (fallthrough)
+branch  1 taken 1319
+       15:  175:				break;
+        -:  176:		}
+        -:  177:	}
+        -:  178:	
+        -:  179:	// If flag is asserted, that means we found a pixel that's in final, all what
+        -:  180:	// we have to do now is just search for pixels that are in the mid range.
+        -:  181:	// Also, make sure that it's in the peaks to begin with.
+     1210:  182:	if (flag)
+branch  0 taken 773 (fallthrough)
+branch  1 taken 437
+        -:  183:	{
+     3092:  184:		for (int p = -1; p <= 1; p++)
+branch  0 taken 2319 (fallthrough)
+branch  1 taken 773
+        -:  185:		{
+     9276:  186:			for (int q = -1; q <= 1; q++)
+branch  0 taken 6957 (fallthrough)
+branch  1 taken 2319
+        -:  187:			{
+     6957:  188:				if (mag[a+p][b+q] >= lo && peaks->contains(a+p, b+q))
+branch  0 taken 6615 (fallthrough)
+branch  1 taken 342
+call    2 returned 6615
+branch  3 taken 2854 (fallthrough)
+branch  4 taken 3761
+branch  5 taken 2854 (fallthrough)
+branch  6 taken 4103
+        -:  189:				{
+     2854:  190:					recursiveDT(mag, final, h, peaks, a+p, b+q, 1);
+call    0 returned 2854
+     2854:  191:					final[a][b] = 255;
+        -:  192:				}
+        -:  193:			}
+        -:  194:		}
+        -:  195:	}
+        -:  196:
+     1210:  197:	return;
+        -:  198:}

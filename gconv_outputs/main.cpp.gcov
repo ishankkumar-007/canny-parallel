@@ -1,0 +1,435 @@
+        -:    0:Source:main.cpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:main.gcda
+        -:    0:Runs:1
+        -:    1:// Soliman Alnaizy, UCFID: 3715450
+        -:    2:// CAP 4453, Dr. Lobo, Fall 2018
+        -:    3:// ========================================================
+        -:    4:// ASSIGNMENT #1.2: C A N N Y   E D G E   D E T E C T I O N
+        -:    5:// ========================================================
+        -:    6:
+        -:    7:#include "header_files/canny.hpp"
+        -:    8:#include "header_files/global.hpp"
+        -:    9:#include "header_files/HashMap.hpp"
+        -:   10:
+        -:   11:using namespace std;
+        -:   12:
+        -:   13:char type[10];
+        -:   14:int height;
+        -:   15:int width;
+        -:   16:int intensity;
+        -:   17:int hi;
+        -:   18:int lo;
+        -:   19:double sig;
+        -:   20:
+function main called 1 returned 100% blocks executed 73%
+        1:   21:int main(int argc, char **argv)
+        -:   22:{
+        -:   23:	// Exit program if proper arguments are not provided by user
+        1:   24:	if (argc != 4)
+branch  0 taken 0 (fallthrough)
+branch  1 taken 1
+        -:   25:	{
+    #####:   26:		cout << "Proper syntax: ./a.out <input_filename> <high_threshold> <sigma_value>" << endl;
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    #####:   27:		return 0;
+        -:   28:	}
+        -:   29:
+        -:   30:	// Exit program if file doesn't open
+        2:   31:	string filename(argv[1]);
+call    0 returned 1
+call    1 returned 1
+branch  2 taken 1 (fallthrough)
+branch  3 taken 0 (throw)
+call    4 returned 1
+call    5 never executed
+        2:   32:	string path = "./input_images/" + filename;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        2:   33:	ifstream infile(path, ios::binary);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        1:   34:	if (!infile.is_open())
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+branch  3 taken 0 (fallthrough)
+branch  4 taken 1
+        -:   35:	{
+    #####:   36:		cout << "File " << path << " not found in directory." << endl;
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+call    6 never executed
+branch  7 never executed
+branch  8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    #####:   37:		return 0;
+        -:   38:	}	
+        -:   39:
+        -:   40:	// Opening output files
+        2:   41:	ofstream img1("./output_images/canny_mag.pgm", ios::binary);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        2:   42:	ofstream img2("./output_images/canny_peaks.pgm", ios::binary);		
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        1:   43:	ofstream img3("./output_images/canny_final.pgm", ios::binary);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 never executed
+        -:   44:
+        1:   45:	::hi = stoi(argv[2]);
+call    0 returned 1
+call    1 returned 1
+branch  2 taken 1 (fallthrough)
+branch  3 taken 0 (throw)
+call    4 returned 1
+branch  5 taken 1 (fallthrough)
+branch  6 taken 0 (throw)
+call    7 returned 1
+call    8 returned 1
+call    9 never executed
+call   10 never executed
+        1:   46:	::lo = .35 * hi;
+        1:   47:	::sig = stoi(argv[3]);
+call    0 returned 1
+call    1 returned 1
+branch  2 taken 1 (fallthrough)
+branch  3 taken 0 (throw)
+call    4 returned 1
+branch  5 taken 1 (fallthrough)
+branch  6 taken 0 (throw)
+call    7 returned 1
+call    8 returned 1
+call    9 never executed
+call   10 never executed
+        -:   48:
+     1001:   49:	for (int iiii=0; iiii<1000; iiii++){
+branch  0 taken 1000 (fallthrough)
+branch  1 taken 1
+        -:   50:
+        -:   51:
+        -:   52:	// Storing header information and copying into the new ouput images
+     1000:   53:	infile >> ::type >> ::width >> ::height >> ::intensity;
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1000
+branch  7 taken 1000 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 returned 1000
+branch 10 taken 1000 (fallthrough)
+branch 11 taken 0 (throw)
+     1000:   54:	img1 << type << endl << width << " " << height << endl << intensity << endl;
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1000
+branch  7 taken 1000 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 returned 1000
+branch 10 taken 1000 (fallthrough)
+branch 11 taken 0 (throw)
+call   12 returned 1000
+branch 13 taken 1000 (fallthrough)
+branch 14 taken 0 (throw)
+call   15 returned 1000
+branch 16 taken 1000 (fallthrough)
+branch 17 taken 0 (throw)
+call   18 returned 1000
+branch 19 taken 1000 (fallthrough)
+branch 20 taken 0 (throw)
+call   21 returned 1000
+branch 22 taken 1000 (fallthrough)
+branch 23 taken 0 (throw)
+     1000:   55:	img2 << type << endl << width << " " << height << endl << intensity << endl;
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1000
+branch  7 taken 1000 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 returned 1000
+branch 10 taken 1000 (fallthrough)
+branch 11 taken 0 (throw)
+call   12 returned 1000
+branch 13 taken 1000 (fallthrough)
+branch 14 taken 0 (throw)
+call   15 returned 1000
+branch 16 taken 1000 (fallthrough)
+branch 17 taken 0 (throw)
+call   18 returned 1000
+branch 19 taken 1000 (fallthrough)
+branch 20 taken 0 (throw)
+call   21 returned 1000
+branch 22 taken 1000 (fallthrough)
+branch 23 taken 0 (throw)
+     1000:   56:	img3 << type << endl << width << " " << height << endl << intensity << endl;
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1000
+branch  7 taken 1000 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 returned 1000
+branch 10 taken 1000 (fallthrough)
+branch 11 taken 0 (throw)
+call   12 returned 1000
+branch 13 taken 1000 (fallthrough)
+branch 14 taken 0 (throw)
+call   15 returned 1000
+branch 16 taken 1000 (fallthrough)
+branch 17 taken 0 (throw)
+call   18 returned 1000
+branch 19 taken 1000 (fallthrough)
+branch 20 taken 0 (throw)
+call   21 returned 1000
+branch 22 taken 1000 (fallthrough)
+branch 23 taken 0 (throw)
+        -:   57:
+        -:   58:	// These matrices will hold the integer values of the input image and masks.
+        -:   59:	// I'm dynamically allocating arrays to easily pass them into functions.
+    1000*:   60:	double **pic = new double*[height], **mag = new double*[height], **final = new double*[height];
+branch  0 taken 1000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+branch  6 taken 1000 (fallthrough)
+branch  7 taken 0
+call    8 never executed
+call    9 returned 1000
+branch 10 taken 1000 (fallthrough)
+branch 11 taken 0 (throw)
+branch 12 taken 1000 (fallthrough)
+branch 13 taken 0
+call   14 never executed
+call   15 returned 1000
+branch 16 taken 1000 (fallthrough)
+branch 17 taken 0 (throw)
+    1000*:   61:	double **x = new double*[height], **y = new double*[height];
+branch  0 taken 1000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+branch  6 taken 1000 (fallthrough)
+branch  7 taken 0
+call    8 never executed
+call    9 returned 1000
+branch 10 taken 1000 (fallthrough)
+branch 11 taken 0 (throw)
+        -:   62:
+   257000:   63:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+        -:   64:	{
+  256000*:   65:		pic[i] = new double[width];
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 256000
+branch  4 taken 256000 (fallthrough)
+branch  5 taken 0 (throw)
+  256000*:   66:		mag[i] = new double[width];
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 256000
+branch  4 taken 256000 (fallthrough)
+branch  5 taken 0 (throw)
+  256000*:   67:		final[i] = new double[width];
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 256000
+branch  4 taken 256000 (fallthrough)
+branch  5 taken 0 (throw)
+  256000*:   68:		x[i] = new double[width];
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 256000
+branch  4 taken 256000 (fallthrough)
+branch  5 taken 0 (throw)
+  256000*:   69:		y[i] = new double[width];
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 0
+call    2 never executed
+call    3 returned 256000
+branch  4 taken 256000 (fallthrough)
+branch  5 taken 0 (throw)
+        -:   70:	}
+        -:   71:
+        -:   72:	// Reading in the input image as integers
+   257000:   73:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+ 65792000:   74:		for (int j = 0; j < width; j++)
+branch  0 taken 65536000 (fallthrough)
+branch  1 taken 256000
+ 65536000:   75:			pic[i][j] = (int)infile.get();
+call    0 returned 65536000
+branch  1 taken 65536000 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   76:
+        -:   77:	// Create the magniute matrix
+     1000:   78:	magnitude_matrix(pic, mag, x, y);
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   79:
+        -:   80:	// Get all the peaks and store them in vector
+     1000:   81:	HashMap *peaks = new HashMap();
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 never executed
+     2000:   82:	vector<Point*> v = peak_detection(mag, peaks, x, y);
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+call    4 never executed
+        -:   83:
+        -:   84:	// Go through the vector and call the recursive function and each point. If the value
+        -:   85:	// in the mag matrix is hi, then immediately accept it in final. If lo, then immediately
+        -:   86:	// reject. If between lo and hi, then check if it's next to a hi pixel using recursion
+     1000:   87:	HashMap *h = new HashMap();
+call    0 returned 1000
+branch  1 taken 1000 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1000
+branch  4 taken 1000 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 never executed
+        -:   88:	int a, b;
+    17948:   89:	for (int i = 0; i < v.size(); i++)
+call    0 returned 17948
+branch  1 taken 16948 (fallthrough)
+branch  2 taken 1000
+        -:   90:	{
+    16948:   91:		a = v.at(i)->x;
+call    0 returned 16948
+branch  1 taken 16948 (fallthrough)
+branch  2 taken 0 (throw)
+    16948:   92:		b = v.at(i)->y;
+call    0 returned 16948
+branch  1 taken 16948 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   93:
+    16948:   94:		if (mag[a][b] >= hi)
+branch  0 taken 1603 (fallthrough)
+branch  1 taken 15345
+     1603:   95:			final[a][b] = 255;
+    15345:   96:		else if (mag[a][b] < lo)
+branch  0 taken 14720 (fallthrough)
+branch  1 taken 625
+    14720:   97:			final[a][b] = 0;
+        -:   98:		else
+      625:   99:			recursiveDT(mag, final, h, peaks, a, b, 0);
+call    0 returned 625
+branch  1 taken 625 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  100:	}
+        -:  101:
+        -:  102:	// ================================= IMAGE OUTPUT =================================
+        -:  103:	// Outputting the 'mag' matrix to img1. It's very important to cast it to a char.
+        -:  104:	// To make sure that the decimal doesn't produce any wonky results, cast to an int
+        -:  105:	// ================================= IMAGE OUTPUT =================================
+   257000:  106:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+ 65792000:  107:		for (int j = 0; j < width; j++)
+branch  0 taken 65536000 (fallthrough)
+branch  1 taken 256000
+ 65536000:  108:			img1 << (char)((int)mag[i][j]);
+call    0 returned 65536000
+branch  1 taken 65536000 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  109:
+        -:  110:	// Outputting the points stored in the vector to img2
+     1000:  111:	int k = 0;
+    17948:  112:	for (int i = 0; i < v.size(); i++)
+call    0 returned 17948
+branch  1 taken 16948 (fallthrough)
+branch  2 taken 1000
+        -:  113:	{
+    64965:  114:		while(k++ != (v.at(i)->x * height + v.at(i)->y - 1))
+call    0 returned 64965
+branch  1 taken 64965 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 64965
+branch  4 taken 64965 (fallthrough)
+branch  5 taken 0 (throw)
+branch  6 taken 48017 (fallthrough)
+branch  7 taken 16948
+    48017:  115:			img2 << (char)(0);
+call    0 returned 48017
+branch  1 taken 48017 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  116:
+    16948:  117:		img2 << (char)(255);
+call    0 returned 16948
+branch  1 taken 16948 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  118:	}
+        -:  119:
+        -:  120:	// Output the 'final' matrix to img1
+   257000:  121:	for (int i = 0; i < height; i++)
+branch  0 taken 256000 (fallthrough)
+branch  1 taken 1000
+ 65792000:  122:		for (int j = 0; j < width; j++)
+branch  0 taken 65536000 (fallthrough)
+branch  1 taken 256000
+ 65536000:  123:			img3 << (char)((int)final[i][j]);		
+call    0 returned 65536000
+branch  1 taken 65536000 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  124:
+        -:  125:	}
+        -:  126:
+        1:  127:	return 0;
+call    0 returned 1
+        -:  128:}

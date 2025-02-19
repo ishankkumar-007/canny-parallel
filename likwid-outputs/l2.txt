@@ -1,0 +1,33 @@
+--------------------------------------------------------------------------------
+CPU name:	Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz
+CPU type:	Intel Coffeelake processor
+CPU clock:	3.00 GHz
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Group 1: L2
++-----------------------+---------+--------------+
+|         Event         | Counter |  HWThread 0  |
++-----------------------+---------+--------------+
+|   INSTR_RETIRED_ANY   |  FIXC0  | 336321233722 |
+| CPU_CLK_UNHALTED_CORE |  FIXC1  |  90156594986 |
+|  CPU_CLK_UNHALTED_REF |  FIXC2  |  58944465875 |
+|    L1D_REPLACEMENT    |   PMC0  |    125707066 |
+|      L1D_M_EVICT      |   PMC1  |     47520883 |
+| ICACHE_64B_IFTAG_MISS |   PMC2  |      4231499 |
++-----------------------+---------+--------------+
+
++--------------------------------+------------+
+|             Metric             | HWThread 0 |
++--------------------------------+------------+
+|       Runtime (RDTSC) [s]      |    20.3069 |
+|      Runtime unhalted [s]      |    30.0480 |
+|           Clock [MHz]          |  4589.1923 |
+|               CPI              |     0.2681 |
+|  L2D load bandwidth [MBytes/s] |   396.1827 |
+|  L2D load data volume [GBytes] |     8.0453 |
+| L2D evict bandwidth [MBytes/s] |   149.7684 |
+| L2D evict data volume [GBytes] |     3.0413 |
+|     L2 bandwidth [MBytes/s]    |   559.2873 |
+|     L2 data volume [GBytes]    |    11.3574 |
++--------------------------------+------------+
+
