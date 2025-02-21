@@ -27,6 +27,10 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	double startTime = omp_get_wtime();	
+	for (int xxx=0; xxx<1; xxx++)
+	{
+
 	// Exit program if file doesn't open
 	string filename(argv[1]);
 	string path = "./input_images/" + filename;
@@ -72,9 +76,6 @@ int main(int argc, char **argv)
 			pic[i][j] = (int)infile.get();
 
 
-	double startTime = omp_get_wtime();	
-	for (int xxx=0; xxx<1000; xxx++)
-	{
 		// Create the magniute matrix
 		magnitude_matrix(pic, mag, x, y);
 
@@ -123,6 +124,8 @@ int main(int argc, char **argv)
 			for (int j = 0; j < width; j++)
 				img3 << (char)((int)final[i][j]);		
 	}
+
+	
 	double endTime = omp_get_wtime();
 	double execTime = endTime - startTime;
 

@@ -8,12 +8,14 @@ using namespace std;
 // scanning convolution on the input pic matrix. This will give us the Δy and Δx matrices
 // Finally, take the sqrt of the sum of Δy^2 and Δx^2 to find the magnitude.
 // =================================== Magnitude Image ==================================
+
+
 void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 {
 	int dim = 6 * sig + 1, cent = dim / 2;
 	double maskx[dim][dim], masky[dim][dim];
 
-	#pragma omp parallel shared(maskx, masky)
+	#pragma omp parallel
 	{
 		// Use the Gausian 1st derivative formula to fill in the mask values
 		#pragma omp for collapse(2) schedule(dynamic)
@@ -27,7 +29,7 @@ void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 		}
 
 		// Scanning convolution
-		#pragma omp parallel for collapse(2) schedule(dynamic)
+		#pragma omp for collapse(2) schedule(dynamic)
 		for (int i = 0; i < height; i++)
 		{ 
 			for (int j = 0; j < width; j++)
@@ -55,7 +57,7 @@ void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 
 		// Find magnitude and maxVal, then store it in the 'mag' matrix
 		double maxVal = 0;
-		#pragma omp parallel for collapse(2) schedule(dynamic) reduction(max:maxVal)
+		// #pragma omp for collapse(2) schedule(dynamic) reduction(max:maxVal)
 		for (int i = 0; i < height; i++)
 		{
 			for(int j = 0; j < width; j++)
@@ -67,7 +69,7 @@ void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 		}
 
 		// Make sure all the magnitude values are between 0-255
-		#pragma omp parallel for collapse(2) schedule(dynamic)
+		#pragma omp for collapse(2) schedule(dynamic)
 		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++)
 				mag[i][j] = mag[i][j] / maxVal * 255;
@@ -76,6 +78,154 @@ void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 
 	return;
 }
+
+
+
+
+/* void magnitude_matrix(double **pic, double **mag, double **x, double **y)
+{
+    int dim = 6 * sig + 1, cent = dim / 2;
+    double maskx[dim][dim], masky[dim][dim];
+
+    // Fill the mask values using the Gaussian 1st derivative formula
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int p = -cent; p <= cent; p++)
+    {    
+        for (int q = -cent; q <= cent; q++)
+        {
+            maskx[p+cent][q+cent] = q * exp(-1 * ((p * p + q * q) / (2 * sig * sig)));
+            masky[p+cent][q+cent] = p * exp(-1 * ((p * p + q * q) / (2 * sig * sig)));
+        }
+    }
+
+    // Scanning convolution
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int i = 0; i < height; i++)
+    { 
+        for (int j = 0; j < width; j++)
+        {
+            double sumx = 0, sumy = 0;
+
+            // Convolution
+            for (int p = -cent; p <= cent; p++)
+            {
+                for (int q = -cent; q <= cent; q++)
+                {
+                    if ((i+p) < 0 || (j+q) < 0 || (i+p) >= height || (j+q) >= width)
+                        continue;
+                    
+                    sumx += pic[i+p][j+q] * maskx[p+cent][q+cent];
+                    sumy += pic[i+p][j+q] * masky[p+cent][q+cent];
+                }
+            }
+
+            // Store convolution result in respective matrix
+            x[i][j] = sumx;
+            y[i][j] = sumy;
+        }
+    }
+
+    // Find magnitude and maxVal
+    double maxVal = 0;
+    #pragma omp parallel for collapse(2) schedule(dynamic) reduction(max:maxVal)
+    for (int i = 0; i < height; i++)
+    {
+        for(int j = 0; j < width; j++)
+        {
+            mag[i][j] = sqrt((x[i][j] * x[i][j]) + (y[i][j] * y[i][j]));
+            if (mag[i][j] > maxVal)
+                maxVal = mag[i][j];
+        }
+    }
+
+    // Normalize magnitudes to the range 0-255
+    // if (maxVal > 0) {
+	#pragma omp parallel for collapse(2) schedule(dynamic)
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			mag[i][j] = mag[i][j] / maxVal * 255;
+		}
+	}
+    // }
+} */
+
+
+/* 
+void magnitude_matrix(double **pic, double **mag, double **x, double **y)
+{
+	int dim = 6 * sig + 1, cent = dim / 2;
+	double maskx[dim][dim], masky[dim][dim];
+
+	// Use the Gausian 1st derivative formula to fill in the mask values
+	int p, q;
+	//printf("hello\n");
+    #pragma omp parallel for private(p, q) shared(maskx, masky)
+	for (int p = -cent; p <= cent; p++)
+	{	
+		// printf("hello\n");
+		for (int q = -cent; q <= cent; q++)
+		{
+			maskx[p+cent][q+cent] = q * exp(-1 * ((p * p + q * q) / (2 * sig * sig)));
+			masky[p+cent][q+cent] = p * exp(-1 * ((p * p + q * q) / (2 * sig * sig)));
+		}
+	}
+
+	// Scanning convolution
+	double sumx, sumy;
+	for (int i = 0; i < height; i++)
+	{ 
+		for (int j = 0; j < width; j++)
+		{
+			sumx = 0;
+			sumy = 0;
+
+			// This is the convolution
+			for (int p = -cent; p <= cent; p++)
+			{
+				for (int q = -cent; q <= cent; q++)
+				{
+					if ((i+p) < 0 || (j+q) < 0 || (i+p) >= height || (j+q) >= width)
+						continue;
+					
+					sumx += pic[i+p][j+q] * maskx[p+cent][q+cent];
+					sumy += pic[i+p][j+q] * masky[p+cent][q+cent];
+				}
+			}
+			
+			// Store convolution result in respective matrix
+			x[i][j] = sumx;
+			y[i][j] = sumy;
+		}
+	}
+
+	// Find magnitude and maxVal, then store it in the 'mag' matrix
+	double mags;
+	double maxVal = 0;
+	for (int i = 0; i < height; i++)
+	{
+		for(int j = 0; j < width; j++)
+		{
+			mags = sqrt((x[i][j] * x[i][j]) + (y[i][j] * y[i][j]));
+
+			if (mags > maxVal)
+				maxVal = mags;
+
+			mag[i][j] = mags;
+		}
+	}
+
+	// Make sure all the magnitude values are between 0-255
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+			mag[i][j] = mag[i][j] / maxVal * 255;
+
+	return;
+}
+*/
+
+
 
 // ================================ Peaks Detection ================================
 // The formula for slope is Δy/Δx. We have Δy and Δx from the scanning convulution
