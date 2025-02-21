@@ -71,53 +71,69 @@ int main(int argc, char **argv)
 		for (int j = 0; j < width; j++)
 			pic[i][j] = (int)infile.get();
 
-	// Create the magniute matrix
-	magnitude_matrix(pic, mag, x, y);
 
-	// Get all the peaks and store them in vector
-	HashMap *peaks = new HashMap();
-	vector<Point*> v = peak_detection(mag, peaks, x, y);
-
-	// Go through the vector and call the recursive function and each point. If the value
-	// in the mag matrix is hi, then immediately accept it in final. If lo, then immediately
-	// reject. If between lo and hi, then check if it's next to a hi pixel using recursion
-	HashMap *h = new HashMap();
-	int a, b;
-	for (int i = 0; i < v.size(); i++)
+	double startTime = omp_get_wtime();	
+	for (int xxx=0; xxx<1000; xxx++)
 	{
-		a = v.at(i)->x;
-		b = v.at(i)->y;
+		// Create the magniute matrix
+		magnitude_matrix(pic, mag, x, y);
 
-		if (mag[a][b] >= hi)
-			final[a][b] = 255;
-		else if (mag[a][b] < lo)
-			final[a][b] = 0;
-		else
-			recursiveDT(mag, final, h, peaks, a, b, 0);
+		// Get all the peaks and store them in vector
+		HashMap *peaks = new HashMap();
+		vector<Point*> v = peak_detection(mag, peaks, x, y);
+
+		// Go through the vector and call the recursive function and each point. If the value
+		// in the mag matrix is hi, then immediately accept it in final. If lo, then immediately
+		// reject. If between lo and hi, then check if it's next to a hi pixel using recursion
+		HashMap *h = new HashMap();
+		int a, b;
+		for (int i = 0; i < v.size(); i++)
+		{
+			a = v.at(i)->x;
+			b = v.at(i)->y;
+
+			if (mag[a][b] >= hi)
+				final[a][b] = 255;
+			else if (mag[a][b] < lo)
+				final[a][b] = 0;
+			else
+				recursiveDT(mag, final, h, peaks, a, b, 0);
+		}
+
+		// ================================= IMAGE OUTPUT =================================
+		// Outputting the 'mag' matrix to img1. It's very important to cast it to a char.
+		// To make sure that the decimal doesn't produce any wonky results, cast to an int
+		// ================================= IMAGE OUTPUT =================================
+		for (int i = 0; i < height; i++)
+			for (int j = 0; j < width; j++)
+				img1 << (char)((int)mag[i][j]);
+
+		// Outputting the points stored in the vector to img2
+		int k = 0;
+		for (int i = 0; i < v.size(); i++)
+		{
+			while(k++ != (v.at(i)->x * height + v.at(i)->y - 1))
+				img2 << (char)(0);
+
+			img2 << (char)(255);
+		}
+
+		// Output the 'final' matrix to img1
+		for (int i = 0; i < height; i++)
+			for (int j = 0; j < width; j++)
+				img3 << (char)((int)final[i][j]);		
 	}
+	double endTime = omp_get_wtime();
+	double execTime = endTime - startTime;
 
-	// ================================= IMAGE OUTPUT =================================
-	// Outputting the 'mag' matrix to img1. It's very important to cast it to a char.
-	// To make sure that the decimal doesn't produce any wonky results, cast to an int
-	// ================================= IMAGE OUTPUT =================================
-	for (int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
-			img1 << (char)((int)mag[i][j]);
-
-	// Outputting the points stored in the vector to img2
-	int k = 0;
-	for (int i = 0; i < v.size(); i++)
+	int omp_threads;
+	#pragma omp parallel
 	{
-		while(k++ != (v.at(i)->x * height + v.at(i)->y - 1))
-			img2 << (char)(0);
-
-		img2 << (char)(255);
+		#pragma omp single
+		omp_threads = omp_get_num_threads();
 	}
-
-	// Output the 'final' matrix to img1
-	for (int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
-			img3 << (char)((int)final[i][j]);		
+	printf("\nNo. of threads\t: %d\n", omp_threads);
+	printf("Total time\t: %lf\n", execTime);
 
 	return 0;
 }
