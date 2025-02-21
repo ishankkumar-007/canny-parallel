@@ -18,7 +18,20 @@ Point::Point()
 
 HashMap::HashMap(void)
 {
-	this->table = new Point*[503];
+	this->capacity = 503;
+	this->size = 0;
+	this->table = new Point*[this->capacity](); // Initialize array with NULLs
+}
+
+// Destructor to free allocated memory
+HashMap::~HashMap()
+{
+	for (int i = 0; i < this->capacity; i++)
+	{
+		if (this->table[i] != NULL)
+			delete this->table[i]; // Free each dynamically allocated Point
+	}
+	delete[] this->table; // Free the table array itself
 }
 
 int HashMap::hash(Point *data)
@@ -41,6 +54,7 @@ int HashMap::contains(int a, int b)
 {
 	Point *temp = new Point(a, b);
 	int hash = this->hash(temp);
+	delete temp; // Free temporary Point after hashing
 
 	for (int i = 0; this->table[hash % this->capacity] != NULL; i++)
 	{
@@ -80,7 +94,7 @@ void HashMap::insert(int a, int b)
 void HashMap::expand(void)
 {
 	this->capacity = this->primes[++this->currentPrime];
-	Point **newTable = new Point*[this->capacity];
+	Point **newTable = new Point*[this->capacity](); // Initialize new array with NULLs
 	Point *temp;
 
 	for (int i = 0; i < this->primes[this->currentPrime - 1]; i++)
@@ -90,11 +104,10 @@ void HashMap::expand(void)
 			continue; 
 
 		int hash = this->hash(temp);
-
 		newTable[hash % this->capacity] = temp;
-
 	}
 
+	delete[] this->table; // Free the old table array
 	this->table = newTable;
 	return;
 }

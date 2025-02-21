@@ -10,7 +10,7 @@ using namespace std;
 // =================================== Magnitude Image ==================================
 
 
-void magnitude_matrix(double **pic, double **mag, double **x, double **y)
+/* void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 {
 	int dim = 6 * sig + 1, cent = dim / 2;
 	double maskx[dim][dim], masky[dim][dim];
@@ -77,12 +77,12 @@ void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 	} // end of parallel region
 
 	return;
-}
+} */
 
 
 
 
-/* void magnitude_matrix(double **pic, double **mag, double **x, double **y)
+void magnitude_matrix(double **pic, double **mag, double **x, double **y)
 {
     int dim = 6 * sig + 1, cent = dim / 2;
     double maskx[dim][dim], masky[dim][dim];
@@ -139,17 +139,32 @@ void magnitude_matrix(double **pic, double **mag, double **x, double **y)
     }
 
     // Normalize magnitudes to the range 0-255
-    // if (maxVal > 0) {
 	#pragma omp parallel for collapse(2) schedule(dynamic)
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < width; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			mag[i][j] = mag[i][j] / maxVal * 255;
 		}
 	}
-    // }
-} */
+	
+	/* // for shared testing and synchronization
+	printf("max = %lf\n", maxVal);
+	#pragma omp parallel shared(maxVal)
+    {
+        #pragma omp critical
+        {
+            printf("max inside = %lf\n", maxVal);
+        }
+
+        #pragma omp for
+        for (int i = 0; i < 2; i++) {
+            printf("threads: %d\n", omp_get_num_threads());
+            printf("hello\n");
+        }
+    } */
+    
+}
 
 
 /* 

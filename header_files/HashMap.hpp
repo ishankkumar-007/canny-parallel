@@ -15,6 +15,7 @@ class HashMap
 {
 	public:
 		HashMap(void);
+		~HashMap();
 		void insert(int, int);
 		int contains(int, int);
 		int getSize(void);

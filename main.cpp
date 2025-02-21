@@ -1,9 +1,3 @@
-// Soliman Alnaizy, UCFID: 3715450
-// CAP 4453, Dr. Lobo, Fall 2018
-// ========================================================
-// ASSIGNMENT #1.2: C A N N Y   E D G E   D E T E C T I O N
-// ========================================================
-
 #include "header_files/canny.hpp"
 #include "header_files/global.hpp"
 #include "header_files/HashMap.hpp"
@@ -27,29 +21,29 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-
-	// Exit program if file doesn't open
-	string filename(argv[1]);
-	string path = "./input_images/" + filename;
-	ifstream infile(path, ios::binary);
-	if (!infile.is_open())
-	{
-		cout << "File " << path << " not found in directory." << endl;
-		return 0;
-	}	
-
-	// Opening output files
-	ofstream img1("./output_images/canny_mag.pgm", ios::binary);
-	ofstream img2("./output_images/canny_peaks.pgm", ios::binary);		
-	ofstream img3("./output_images/canny_final.pgm", ios::binary);
-
-	::hi = stoi(argv[2]);
-	::lo = .35 * hi;
-	::sig = stoi(argv[3]);
-
 	double startTime = omp_get_wtime();	
-	for (int xxx=0; xxx<2; xxx++)
+	for (int xxx=0; xxx<1000; xxx++)
 	{
+
+		// Exit program if file doesn't open
+		string filename(argv[1]);
+		string path = "./input_images/" + filename;
+		ifstream infile(path, ios::binary);
+		if (!infile.is_open())
+		{
+			cout << "File " << path << " not found in directory." << endl;
+			return 0;
+		}	
+
+		// Opening output files
+		ofstream img1("./output_images/canny_mag.pgm", ios::binary);
+		ofstream img2("./output_images/canny_peaks.pgm", ios::binary);		
+		ofstream img3("./output_images/canny_final.pgm", ios::binary);
+
+		::hi = stoi(argv[2]);
+		::lo = .35 * hi;
+		::sig = stoi(argv[3]);
+
 
 		// Storing header information and copying into the new ouput images
 		infile >> ::type >> ::width >> ::height >> ::intensity;
@@ -83,6 +77,14 @@ int main(int argc, char **argv)
 		// Get all the peaks and store them in vector
 		HashMap *peaks = new HashMap();
 		vector<Point*> v = peak_detection(mag, peaks, x, y);
+
+		// Reset final matrix before each iteration
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				final[i][j] = 0;  // Ensure all values are reset
+			}
+		}
+
 
 		// Go through the vector and call the recursive function and each point. If the value
 		// in the mag matrix is hi, then immediately accept it in final. If lo, then immediately
@@ -124,6 +126,25 @@ int main(int argc, char **argv)
 		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++)
 				img3 << (char)((int)final[i][j]);		
+
+		// Free dynamically allocated memory
+		for (int i = 0; i < height; i++) {
+			delete[] pic[i];
+			delete[] mag[i];
+			delete[] final[i];
+			delete[] x[i];
+			delete[] y[i];
+		}
+
+		delete[] pic;
+		delete[] mag;
+		delete[] final;
+		delete[] x;
+		delete[] y;
+
+		delete peaks;
+		delete h;
+
 	}
 
 	
