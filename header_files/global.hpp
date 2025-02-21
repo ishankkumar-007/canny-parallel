@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string.h>
 #include <vector>
+#include <omp.h>
+
 
 // Global type, height, width, intensity, hi, lo, and sig variables
 extern char type[10];
