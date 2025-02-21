@@ -1,6 +1,6 @@
 # Canny Edge Detector
 
-This is my implementation of Sobel and Canny's Edge Detection algorithm in C++. In this program, I've also written up my own HashMap and Point class for my own practice.
+This is my parallel OpenMP implementation of Sobel and Canny's Edge Detection algorithm in C++.
 
 ## 1) Canny
 Using the program is fairly simple. Start by downloading or cloning the repo. I already have two sample images that can be used, however, you can use your own pictures. Just make sure to copy them into the "input_images" folder and that they're in the .pgm format.
