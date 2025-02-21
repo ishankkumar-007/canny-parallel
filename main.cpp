@@ -27,9 +27,6 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	double startTime = omp_get_wtime();	
-	for (int xxx=0; xxx<1; xxx++)
-	{
 
 	// Exit program if file doesn't open
 	string filename(argv[1]);
@@ -50,30 +47,34 @@ int main(int argc, char **argv)
 	::lo = .35 * hi;
 	::sig = stoi(argv[3]);
 
-	// Storing header information and copying into the new ouput images
-	infile >> ::type >> ::width >> ::height >> ::intensity;
-	img1 << type << endl << width << " " << height << endl << intensity << endl;
-	img2 << type << endl << width << " " << height << endl << intensity << endl;
-	img3 << type << endl << width << " " << height << endl << intensity << endl;
-
-	// These matrices will hold the integer values of the input image and masks.
-	// I'm dynamically allocating arrays to easily pass them into functions.
-	double **pic = new double*[height], **mag = new double*[height], **final = new double*[height];
-	double **x = new double*[height], **y = new double*[height];
-
-	for (int i = 0; i < height; i++)
+	double startTime = omp_get_wtime();	
+	for (int xxx=0; xxx<2; xxx++)
 	{
-		pic[i] = new double[width];
-		mag[i] = new double[width];
-		final[i] = new double[width];
-		x[i] = new double[width];
-		y[i] = new double[width];
-	}
 
-	// Reading in the input image as integers
-	for (int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
-			pic[i][j] = (int)infile.get();
+		// Storing header information and copying into the new ouput images
+		infile >> ::type >> ::width >> ::height >> ::intensity;
+		img1 << type << endl << width << " " << height << endl << intensity << endl;
+		img2 << type << endl << width << " " << height << endl << intensity << endl;
+		img3 << type << endl << width << " " << height << endl << intensity << endl;
+
+		// These matrices will hold the integer values of the input image and masks.
+		// I'm dynamically allocating arrays to easily pass them into functions.
+		double **pic = new double*[height], **mag = new double*[height], **final = new double*[height];
+		double **x = new double*[height], **y = new double*[height];
+
+		for (int i = 0; i < height; i++)
+		{
+			pic[i] = new double[width];
+			mag[i] = new double[width];
+			final[i] = new double[width];
+			x[i] = new double[width];
+			y[i] = new double[width];
+		}
+
+		// Reading in the input image as integers
+		for (int i = 0; i < height; i++)
+			for (int j = 0; j < width; j++)
+				pic[i][j] = (int)infile.get();
 
 
 		// Create the magniute matrix
