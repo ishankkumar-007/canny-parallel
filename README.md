@@ -19,4 +19,4 @@ The program will do it's magic. Your output image will be in the "output_images"
 ## Cuda and MPI Implementation
 
 This is the OpenMP implementation of the Canny Edge Detector:  
-[https://github.com/ishankkumar-007/canny-parallel](https://github.com/ishankkumar-007/canny_CUDA-MPI)
+[https://github.com/ishankkumar-007/canny_CUDA-MPI](https://github.com/ishankkumar-007/canny_CUDA-MPI)
