@@ -15,3 +15,8 @@ Same concept as the Canny detector above. Clone the rope. Using a Linux terminal
 Last, type the command "./canny.out <name_of_input_image> <high_threshold> <low_threshold>" in your Linux terminal (make sure to not include the angle brackets). A typical value to use as your "high_threshold" would be ~100, and a typical value for "low_threshold" would be 35.
 
 The program will do it's magic. Your output image will be in the "output_images" folder.
+
+## Cuda and MPI Implementation
+
+This is the OpenMP implementation of the Canny Edge Detector:  
+[https://github.com/ishankkumar-007/canny-parallel](https://github.com/ishankkumar-007/canny_CUDA-MPI)
